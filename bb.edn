@@ -1,0 +1,28 @@
+{:paths ["src"]
+ :deps  {metosin/malli {:mvn/version "0.16.4"}}
+
+ :tasks
+ {:requires ([babashka.classpath :as cp])
+  :init     (cp/add-classpath "test")
+
+  scarlett
+  {:doc      "Run the scarlett CLI with args: `bb scarlett dump --edn`"
+   :requires ([scarlett.cli])
+   :task     (apply scarlett.cli/-main *command-line-args*)}
+
+  test
+  {:doc      "Run all tests under test/"
+   :requires ([clojure.test :as t]
+              [scarlett.device-test]
+              [scarlett.codec-test]
+              [scarlett.state-test]
+              [scarlett.preset-test]
+              [scarlett.io-test])
+   :task     (let [{:keys [fail error]}
+                   (t/run-tests 'scarlett.device-test
+                                'scarlett.codec-test
+                                'scarlett.state-test
+                                'scarlett.preset-test
+                                'scarlett.io-test)]
+               (when (or (pos? fail) (pos? error))
+                 (System/exit 1)))}}}

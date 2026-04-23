@@ -1,0 +1,54 @@
+# ── macOS ───────────────────────────────────────────────
+# Finder still drops .DS_Store into every directory it visits.
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon?
+._*
+.Spotlight-V100
+.Trashes
+.TemporaryItems
+.DocumentRevisions-V100
+.fseventsd
+.VolumeIcon.icns
+.com.apple.timemachine.donotpresent
+
+# ── Emacs ───────────────────────────────────────────────
+# Backup files (foo.txt~)
+*~
+# Auto-save files (#foo.txt#) — leading # must be escaped.
+\#*\#
+# Lock files (.#foo.txt)
+.\#*
+# Native-comp cache (sometimes lands inside project dirs)
+*.eln-cache/
+eln-cache/
+auto-save-list/
+# User-local Emacs dir-locals override; shared .dir-locals.el stays tracked.
+.dir-locals-2.el
+
+# ── Clojure / Babashka tooling ──────────────────────────
+.cpcache/
+.clj-kondo/.cache/
+.lsp/.cache/
+.lsp/.log
+.calva/output-window/
+.portal/
+.nrepl-port
+target/
+
+# ── C build artifacts ───────────────────────────────────
+*.o
+*.dSYM/
+
+# ── Project build output ────────────────────────────────
+# scarlett_ctl is built from scarlett_ctl.c with the one-line
+# command at the top of that file. Commit the source, not the
+# binary. `git add -f scarlett_ctl` if you ever want to force it.
+/scarlett_ctl
+
+# ── Local-only config & scratch ─────────────────────────
+.claude/settings.local.json
+.env
+.env.local
+*.log
