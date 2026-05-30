@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+# Stand-in for ./scarlett_ctl daemon used by scarlett.daemon-test.
+# Emits the ready line, then echoes canned responses for a handful of
+# commands. Any other input comes back as {:ok true :echoed "..."}.
+
+echo '{:ok true :ready true}'
+
+while IFS= read -r line; do
+  case "$line" in
+    quit)          echo '{:ok true :bye true}'; exit 0 ;;
+    ping)          echo '{:ok true :device-open true :fake true}' ;;
+    clock)         echo '{:source 1 :rate 48000}' ;;
+    "bus 0 0")     echo '{:ok true :bus 0 :before 0 :after 0}' ;;
+    "bad cmd")     echo '{:error "bad command" :code 42}' ;;
+    "not edn")     echo 'this is not edn at all' ;;
+    *)             echo "{:ok true :echoed \"$line\"}" ;;
+  esac
+done

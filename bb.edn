@@ -11,18 +11,30 @@
    :task     (apply scarlett.cli/-main *command-line-args*)}
 
   test
-  {:doc      "Run all tests under test/"
+  {:doc      "Run unit tests (device-free; uses fake binary for daemon)"
    :requires ([clojure.test :as t]
               [scarlett.device-test]
               [scarlett.codec-test]
               [scarlett.state-test]
               [scarlett.preset-test]
-              [scarlett.io-test])
+              [scarlett.io-test]
+              [scarlett.daemon-test])
    :task     (let [{:keys [fail error]}
                    (t/run-tests 'scarlett.device-test
                                 'scarlett.codec-test
                                 'scarlett.state-test
                                 'scarlett.preset-test
-                                'scarlett.io-test)]
+                                'scarlett.io-test
+                                'scarlett.daemon-test)]
+               (when (or (pos? fail) (pos? error))
+                 (System/exit 1)))}
+
+  test:device
+  {:doc      "Integration tests against the real device. Requires the
+              Scarlett plugged in and nothing else holding its handle."
+   :requires ([clojure.test :as t]
+              [scarlett.integration-test])
+   :task     (let [{:keys [fail error]}
+                   (t/run-tests 'scarlett.integration-test)]
                (when (or (pos? fail) (pos? error))
                  (System/exit 1)))}}}
