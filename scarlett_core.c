@@ -199,6 +199,11 @@ IOReturn sc_write_matrix_gain(sc_device *h, int node, int16_t raw) {
     return write_i16(h, (uint16_t)node, MIXER_WINDEX, raw);
 }
 
+IOReturn sc_write_bus_mute(sc_device *h, int bus, int16_t raw) {
+    if (bus < 0 || bus >= SC_NUM_BUSES) return kIOReturnBadArgument;
+    return write_i16(h, (uint16_t)(0x0100 + bus), 0x0a00, raw);
+}
+
 /* ── EXPERIMENTAL ──────────────────────────────────────── */
 
 IOReturn sc_save_to_flash(sc_device *h) {

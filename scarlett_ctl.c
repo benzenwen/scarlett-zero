@@ -21,6 +21,7 @@
  *   rate                       Read sample rate
  *   route [OUT SRC]            Read all, or set one (numeric ids)
  *   bus [BUS RAW]              Read all, or set bus volume to signed int16
+ *   mute BUS RAW               Set bus mute (experimental, unverified)
  *   mixer [SLOT SRC]           Read all, or set mixer-input assignment
  *   matrix [NODE RAW]          Read all non-silent, or set matrix gain
  *   dump                       Full state
@@ -164,6 +165,20 @@ static void cmd_bus(int argc, char **argv) {
         }
         printf("}\n");
     }
+}
+
+/* Experimental: mute register encoding is unverified on the 18i20. */
+static void cmd_mute(int argc, char **argv) {
+    if (argc < 3) { edn_error("usage: mute BUS RAW (0 = unmuted, 1 = muted)"); return; }
+    int bus = atoi(argv[1]);
+    int raw = (int)strtol(argv[2], NULL, 0);
+    if (bus < 0 || bus >= NUM_BUSES) { edn_error("bus index must be 0-20"); return; }
+    if (raw < -32768 || raw > 32767) { edn_error("mute raw must fit in int16"); return; }
+    int before = read_bus_mute(bus);
+    kern_return_t kr = sc_write_bus_mute(g_dev, bus, (int16_t)raw);
+    if (kr != KERN_SUCCESS) { edn_error_code("write failed", kr); return; }
+    int after = read_bus_mute(bus);
+    printf("{:ok true :bus %d :before %d :after %d}\n", bus, before, after);
 }
 
 static void cmd_mixer(int argc, char **argv) {
@@ -342,6 +357,7 @@ static struct cmd_entry commands[] = {
     {"rate",   cmd_rate,   1},
     {"route",  cmd_route,  1},
     {"bus",    cmd_bus,    1},
+    {"mute",   cmd_mute,   1},
     {"mixer",  cmd_mixer,  1},
     {"matrix", cmd_matrix, 1},
     {"dump",   cmd_dump,   1},
@@ -410,6 +426,7 @@ static void usage(void) {
         "  scarlett_ctl rate\n"
         "  scarlett_ctl route [OUT SRC]\n"
         "  scarlett_ctl bus    [BUS RAW]\n"
+        "  scarlett_ctl mute   BUS RAW        (experimental)\n"
         "  scarlett_ctl mixer  [SLOT SRC]\n"
         "  scarlett_ctl matrix [NODE RAW]\n"
         "  scarlett_ctl save confirm\n"

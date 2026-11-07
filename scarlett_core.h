@@ -87,6 +87,11 @@ IOReturn sc_write_matrix_gain (sc_device *dev, int node, int16_t raw);
 
 /* ── EXPERIMENTAL (from MixControl disassembly) ────────── */
 
+/* Bus mute (ctl wValue 0x0100+bus, wIndex 0x0a00, 2 bytes). Per x42:
+ * 0 = unmuted, 1 = muted. Read-back on the 18i20 is always 0x0b00, so
+ * the effect can only be verified by ear. */
+IOReturn sc_write_bus_mute(sc_device *dev, int bus, int16_t raw);
+
 /* Persist current state to flash: memory addr 0x5a ← 0xa5. */
 IOReturn sc_save_to_flash(sc_device *dev);
 
