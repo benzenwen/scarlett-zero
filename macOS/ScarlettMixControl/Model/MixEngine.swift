@@ -7,8 +7,24 @@ struct HardwareImage: Equatable, Sendable {
     var mixerInputs: [Int] = Array(repeating: SourceID.off, count: DeviceMap.mixerInputCount)
     var matrix: [Int16] = Array(repeating: Gain.silenceRaw, count: DeviceMap.matrixNodeCount)
     var buses: [Int16] = Array(repeating: 0, count: DeviceMap.busCount)
+    /// Write-only: the device can't report these, so they never take part in
+    /// matching and are always written in full after a read.
+    var monitor = MonitorRegisters()
 
     static func node(input: Int, bus: Int) -> Int { input * DeviceMap.mixBusCount + bus }
+}
+
+/// The firmware's own monitor control (MixControl 1.10.6 disassembly,
+/// verified 2026-11-07). Bit n = analog output n.
+struct MonitorRegisters: Equatable, Sendable {
+    /// mem 0x0a: outputs the firmware attenuates by the front knob, with or
+    /// without a host. MixControl: controlled outputs when HW Control is on,
+    /// otherwise none.
+    var knobMask: UInt32 = 0
+    /// mem 0x0b/0x0c: controlled outputs (front MUTE/DIM), always written.
+    var buttonMask: UInt32 = 0
+    /// DAC mute per analog output: red outputs, and L/R mutes.
+    var dacMute = Array(repeating: false, count: DeviceMap.analogOutputCount)
 }
 
 /// Transient pre-fade listen: temporarily re-routes Monitor Outputs 1/2.
@@ -29,6 +45,7 @@ enum MixEngine {
         hw.mixerInputs = doc.inputs.map(\.source)
         hw.matrix = matrix(for: doc)
         hw.buses = buses(for: doc)
+        hw.monitor = monitorRegisters(for: doc)
         return hw
     }
 
@@ -84,6 +101,10 @@ enum MixEngine {
 
     /// Bus 0 and digital buses pass through; analog buses 1–10 carry the
     /// monitor section (MixControl's blue/red/grey output buttons).
+    ///
+    /// With HW Control the firmware applies the front knob, DIM and MUTE to
+    /// controlled outputs itself, so their output gain stays at 0 dB (plus
+    /// pad); applying the polled knob here too would attenuate twice.
     static func buses(for doc: MixerDocument) -> [Int16] {
         var b = doc.passthroughBuses
         let mon = doc.monitor
@@ -96,7 +117,11 @@ enum MixEngine {
                 gain = nil
             case .controlled:
                 let sideMuted = i % 2 == 0 ? mon.muteLeft : mon.muteRight
-                if mon.mute || sideMuted || mon.levelDB <= MixerDocument.monitorFloorDB {
+                if sideMuted {
+                    gain = nil
+                } else if mon.hardwareControl {
+                    gain = mon.pad && i < 2 ? MixerDocument.padDB : 0
+                } else if mon.mute || mon.levelDB <= MixerDocument.monitorFloorDB {
                     gain = nil
                 } else {
                     gain = mon.levelDB
@@ -107,6 +132,19 @@ enum MixEngine {
             b[i + 1] = Gain.raw(gain, ceiling: 0)
         }
         return b
+    }
+
+    static func monitorRegisters(for doc: MixerDocument) -> MonitorRegisters {
+        let mon = doc.monitor
+        var r = MonitorRegisters()
+        for i in 0..<DeviceMap.analogOutputCount {
+            let controlled = mon.modes[i] == .controlled
+            if controlled { r.buttonMask |= 1 << i }
+            let sideMuted = i % 2 == 0 ? mon.muteLeft : mon.muteRight
+            r.dacMute[i] = mon.modes[i] == .muted || (controlled && sideMuted)
+        }
+        r.knobMask = mon.hardwareControl ? r.buttonMask : 0
+        return r
     }
 
     // MARK: Hardware → document
@@ -138,6 +176,14 @@ enum MixEngine {
             }
         }
         doc.monitor.levelDB = level ?? 0
+        // Nothing attenuated in software: assume the firmware default of the
+        // front knob driving Monitor 1/2 (their output gain stays 0 dB, so
+        // this still matches the hardware).
+        if level == nil {
+            doc.monitor.modes[0] = .controlled
+            doc.monitor.modes[1] = .controlled
+            doc.monitor.hardwareControl = true
+        }
         return doc
     }
 
@@ -145,7 +191,8 @@ enum MixEngine {
     /// what the device holds — i.e. it's safe to show it as the current state.
     static func matches(_ doc: MixerDocument, _ hw: HardwareImage) -> Bool {
         var rendered = image(for: doc)
-        rendered.clock = hw.clock   // clock is live device state, not a match criterion
+        rendered.clock = hw.clock       // clock is live device state, not a match criterion
+        rendered.monitor = hw.monitor   // write-only registers can't be compared
         return rendered == hw
     }
 }

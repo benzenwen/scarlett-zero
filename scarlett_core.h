@@ -87,10 +87,29 @@ IOReturn sc_write_matrix_gain (sc_device *dev, int node, int16_t raw);
 
 /* ── EXPERIMENTAL (from MixControl disassembly) ────────── */
 
-/* Bus mute (ctl wValue 0x0100+bus, wIndex 0x0a00, 2 bytes). Per x42:
- * 0 = unmuted, 1 = muted. Read-back on the 18i20 is always 0x0b00, so
- * the effect can only be verified by ear. */
+/* Bus mute (ctl wValue 0x0100+bus, wIndex 0x0a00) as a raw int16. The
+ * control is really one byte (see sc_write_dac_mute); the old "always
+ * 0x0b00" read-back was byte 0 = 0 (unmuted) plus a junk second byte. */
 IOReturn sc_write_bus_mute(sc_device *dev, int bus, int16_t raw);
+
+/* ── Monitor output sets (verified 2026-11-07) ─────────────
+ * Bit n = analog output n (0 = Mon 1 … 9 = Line 10).
+ *
+ * Knob set (mem 0x0a, 4 bytes LE): outputs the FIRMWARE attenuates by the
+ * front MONITOR knob, standalone, with no host involved. MixControl's
+ * HW Control writes its "controlled" outputs here when on and 0 when off.
+ * Flash ships with outputs 1–6 set, which is why Line 3–6 sound dead with
+ * the knob turned down.
+ *
+ * Button set (mem 0x0b and 0x0c, same mask): MixControl always writes the
+ * controlled outputs here; presumably the outputs the front MUTE/DIM act on.
+ *
+ * DAC mute (ctl 0x0100+output+1 @ 0x0a00, 1 byte): 1 = muted. MixControl's
+ * red output buttons and L/R mutes.                                       */
+IOReturn sc_write_monitor_knob_set  (sc_device *dev, uint32_t mask);
+IOReturn sc_write_monitor_button_set(sc_device *dev, uint32_t mask);
+IOReturn sc_write_dac_mute(sc_device *dev, int output, int muted);   /* output 0–9 */
+int      sc_read_dac_mute (sc_device *dev, int output);              /* 0/1, or -1 */
 
 /* Persist current state to flash: memory addr 0x5a ← 0xa5. */
 IOReturn sc_save_to_flash(sc_device *dev);

@@ -32,7 +32,10 @@ and Monitor sections below.
   link, and a mix output strip with destinations, Copy To…, and Stereo.
 * Routing: all 20 outputs with MixControl's routing presets.
 * Monitor: per-output controlled/muted/fixed buttons, level knob,
-  Dim, Mute, L/R mute, pad, monitor presets.
+  Dim, Mute, L/R mute, pad, monitor presets. HW Control hands the
+  controlled outputs to the front-panel knob, DIM and MUTE inside the
+  device itself (the on-screen knob follows it); off, the app's knob
+  sets their level and the front knob does nothing.
 * Device: connection, sample rate, sync source; "Release for CLI"
   hands the USB device to scarlett_ctl without quitting.
 * File: Open/Save snapshots (.scarlettmix JSON), import legacy
@@ -41,8 +44,11 @@ and Monitor sections below.
 On connect the app adopts the device state (or your saved document if it
 matches), then writes that state in full once — the 18i20's mixer matrix
 reads back 0 dB after power-up no matter what it is actually doing, so
-only written values can be trusted. Unverified hardware commands
-(meters, front-panel HW Control, mono, Save to Hardware) sit behind
+only written values can be trusted. That includes the firmware's
+monitor sets (which outputs the front knob attenuates — flash ships with
+outputs 1–6, so Line 3–6 go quiet with the knob turned down), so after
+a power cycle, launch the app to restore your setup. Unverified hardware
+commands (meters, mono, Save to Hardware) sit behind
 Settings ▸ "Enable experimental hardware features", off by default.
 
 Build: open macOS/ScarlettMixControl.xcodeproj in Xcode and run, or
@@ -122,7 +128,7 @@ Outputs use keywords; e.g. :mon-l, :daw-1, :anlg-3, :spdif-l,
 * Mixer input research and testing: The input values are guesses. 
 * Write to non-volatile memory
 * Testing
-* Verify the experimental commands (meters, HW Control, mono, save)
+* Verify the experimental commands (meters, mono, save)
 
 ## Build notes
 

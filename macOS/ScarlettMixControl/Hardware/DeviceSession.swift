@@ -216,9 +216,21 @@ final class DeviceSession: @unchecked Sendable {
             return
         }
 
+        // Each poll may close the handle (unplug), so re-read `self.device`
+        // before the next one — a captured copy would be freed memory.
         if tick % 40 == 0 { pollClock(device) }
-        if polling.meters, meterFailures < 20 { pollMeters(device) }
-        if polling.hardwareMonitor, tick % 2 == 0 { pollMonitor(device) }
+        if polling.meters, meterFailures < 20, let device = self.device { pollMeters(device) }
+        if polling.hardwareMonitor, tick % 2 == 0, let device = self.device { pollMonitor(device) }
+    }
+
+    /// Three failed reads in a row means the device went away (cable out,
+    /// power off): drop the handle and go back to searching.
+    private func noteReadFailure() {
+        readFailures += 1
+        guard readFailures >= 3 else { return }
+        log(.error, "device stopped responding — disconnected")
+        close()
+        publish(.disconnected)
     }
 
     private func tryOpen() {
@@ -236,6 +248,8 @@ final class DeviceSession: @unchecked Sendable {
         }
         device = handle
         readFailures = 0
+        meterFailures = 0   // a replug shouldn't leave meters switched off
+        metersSeen = false
         guard let image = readImage(handle) else {
             close()
             publish(.busy)
@@ -321,9 +335,36 @@ final class DeviceSession: @unchecked Sendable {
                 w.matrix[n] = d.matrix[n]
             }
         }
+        // Monitor registers are ordered around the output gains so a change
+        // never passes through a louder state: knob attenuation and mutes
+        // land before gains rise; knob release and unmutes after they fall.
+        func writeKnobSet() {
+            let mask = d.monitor.knobMask
+            if check(sc_write_monitor_knob_set(device, mask), "Monitor knob set", "knobset \(mask)") {
+                w.monitor.knobMask = mask
+            }
+        }
+        func writeDacMutes(_ muted: Bool) {
+            for i in 0..<DeviceMap.analogOutputCount
+            where d.monitor.dacMute[i] == muted && (all || d.monitor.dacMute[i] != w.monitor.dacMute[i]) {
+                if check(sc_write_dac_mute(device, Int32(i), muted ? 1 : 0), "Output mute", "dacmute \(i) \(muted ? 1 : 0)") {
+                    w.monitor.dacMute[i] = muted
+                }
+            }
+        }
+        if all || d.monitor.knobMask & ~w.monitor.knobMask != 0 { writeKnobSet() }
+        writeDacMutes(true)
         for b in 0..<DeviceMap.busCount where all || d.buses[b] != w.buses[b] {
             if check(sc_write_bus_volume(device, Int32(b), d.buses[b]), "Output volume", "bus \(b) \(d.buses[b])") {
                 w.buses[b] = d.buses[b]
+            }
+        }
+        if d.monitor.knobMask != w.monitor.knobMask { writeKnobSet() }
+        writeDacMutes(false)
+        if all || d.monitor.buttonMask != w.monitor.buttonMask {
+            let mask = d.monitor.buttonMask
+            if check(sc_write_monitor_button_set(device, mask), "Monitor button set", "buttonset \(mask)") {
+                w.monitor.buttonMask = mask
             }
         }
         written = w
@@ -335,11 +376,7 @@ final class DeviceSession: @unchecked Sendable {
         let source = Int(sc_read_clock_source(d))
         let rate = Int(sc_read_sample_rate(d))
         guard source > 0, rate > 0 else {
-            readFailures += 1
-            if readFailures >= 3 {
-                close()
-                publish(.disconnected)
-            }
+            noteReadFailure()
             return
         }
         readFailures = 0
@@ -377,7 +414,11 @@ final class DeviceSession: @unchecked Sendable {
 
     private func pollMonitor(_ d: OpaquePointer) {
         var s = sc_monitor_state()
-        guard sc_read_monitor_state(d, &s) == 0 else { return }
+        guard sc_read_monitor_state(d, &s) == 0 else {
+            noteReadFailure()
+            return
+        }
+        readFailures = 0
         let m = HardwareMonitor(levelDB: -Double(s.knob_atten_db), mute: s.mute != 0, dim: s.dim != 0)
         if m != lastMonitor {
             lastMonitor = m
@@ -465,6 +506,23 @@ private extension DeviceSession {
             let after = sc_read_matrix_gain(d, Int32(args[0]))
             written?.matrix[args[0]] = Int16(truncatingIfNeeded: after)
             return "{:ok true :node \(args[0]) :before \(before) :after \(after)}"
+        case ("knobset", _) where args.count >= 1, ("buttonset", _) where args.count >= 1:
+            guard (0...0x3ff).contains(args[0]) else { return "{:error \"mask must be 0-0x3ff\"}" }
+            let mask = UInt32(args[0])
+            let rc = cmd == "knobset" ? sc_write_monitor_knob_set(d, mask) : sc_write_monitor_button_set(d, mask)
+            guard rc == kIOReturnSuccess else { return "{:error \"write failed\" :code \(Self.hex(rc))}" }
+            if cmd == "knobset" { written?.monitor.knobMask = mask } else { written?.monitor.buttonMask = mask }
+            return "{:ok true :\(cmd) \(mask)}"
+        case ("dacmute", 0):
+            return edn((0..<DeviceMap.analogOutputCount).map { ($0, Int(sc_read_dac_mute(d, Int32($0)))) })
+        case ("dacmute", _) where args.count >= 2:
+            guard (0..<DeviceMap.analogOutputCount).contains(args[0]) else { return "{:error \"output must be 0-9\"}" }
+            let before = sc_read_dac_mute(d, Int32(args[0]))
+            let rc = sc_write_dac_mute(d, Int32(args[0]), args[1] != 0 ? 1 : 0)
+            guard rc == kIOReturnSuccess else { return "{:error \"write failed\" :code \(Self.hex(rc))}" }
+            let after = sc_read_dac_mute(d, Int32(args[0]))
+            written?.monitor.dacMute[args[0]] = after == 1
+            return "{:ok true :output \(args[0]) :before \(before) :after \(after)}"
         case ("dump", _):
             return ["clock", "route", "mixer", "bus", "matrix"].map { "\($0) \(run([$0]))" }.joined(separator: "\n")
         case ("meters", _):
@@ -475,7 +533,6 @@ private extension DeviceSession {
             let c = m.withUnsafeMutableBufferPointer { sc_read_meters_mixes(d, $0.baseAddress) }
             return "{:inputs \(a < 0 ? "nil" : "\(i)") :daw \(b < 0 ? "nil" : "\(w)") :mixes \(c < 0 ? "nil" : "\(m)")}"
         case ("monitor", _):
-            guard polling.experimental else { return "{:error \"monitor state is experimental — enable in Settings\"}" }
             var st = sc_monitor_state()
             guard sc_read_monitor_state(d, &st) == 0 else { return "{:error \"read failed\"}" }
             return "{:knob-atten-db \(st.knob_atten_db) :mute \(st.mute != 0) :dim \(st.dim != 0)}"
@@ -494,7 +551,11 @@ private extension DeviceSession {
       mixer [SLOT SRC]         SLOT 0–17
       bus [BUS RAW]            BUS 0–20, RAW int16 (1/256 dB; -32768 = −∞)
       matrix [NODE RAW]        NODE 0–143 (= slot*8 + mix bus)
-      meters | monitor         experimental reads (Settings)
+      knobset MASK             outputs the front knob attenuates (bit n = analog out n)
+      buttonset MASK           outputs the front MUTE/DIM act on
+      dacmute [OUT 0|1]        OUT 0–9
+      monitor                  front panel: knob attenuation, mute, dim
+      meters                   experimental read (Settings)
     Console writes bypass the document — use Device ▸ Reload from Hardware to adopt them.
     """
 }

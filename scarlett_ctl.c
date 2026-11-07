@@ -21,7 +21,10 @@
  *   rate                       Read sample rate
  *   route [OUT SRC]            Read all, or set one (numeric ids)
  *   bus [BUS RAW]              Read all, or set bus volume to signed int16
- *   mute BUS RAW               Set bus mute (experimental, unverified)
+ *   mute BUS RAW               Set bus mute as raw int16 (experimental)
+ *   knobset MASK               Outputs the front knob attenuates (bit n = out n)
+ *   buttonset MASK             Outputs the front MUTE/DIM act on
+ *   dacmute [OUT 0|1]          Read all, or mute/unmute analog output 0-9
  *   mixer [SLOT SRC]           Read all, or set mixer-input assignment
  *   matrix [NODE RAW]          Read all non-silent, or set matrix gain
  *   dump                       Full state
@@ -179,6 +182,46 @@ static void cmd_mute(int argc, char **argv) {
     if (kr != KERN_SUCCESS) { edn_error_code("write failed", kr); return; }
     int after = read_bus_mute(bus);
     printf("{:ok true :bus %d :before %d :after %d}\n", bus, before, after);
+}
+
+static int parse_mask(const char *s, uint32_t *out) {
+    char *end;
+    long v = strtol(s, &end, 0);
+    if (*end || v < 0 || v > 0x3ff) return -1;
+    *out = (uint32_t)v;
+    return 0;
+}
+
+/* Monitor sets are write-only (MixControl never reads them back). */
+static void cmd_knobset(int argc, char **argv) {
+    uint32_t mask;
+    if (argc < 2 || parse_mask(argv[1], &mask)) { edn_error("usage: knobset MASK (0-0x3ff, bit n = analog out n)"); return; }
+    kern_return_t kr = sc_write_monitor_knob_set(g_dev, mask);
+    if (kr != KERN_SUCCESS) { edn_error_code("write failed", kr); return; }
+    printf("{:ok true :knobset %u}\n", mask);
+}
+
+static void cmd_buttonset(int argc, char **argv) {
+    uint32_t mask;
+    if (argc < 2 || parse_mask(argv[1], &mask)) { edn_error("usage: buttonset MASK (0-0x3ff, bit n = analog out n)"); return; }
+    kern_return_t kr = sc_write_monitor_button_set(g_dev, mask);
+    if (kr != KERN_SUCCESS) { edn_error_code("write failed", kr); return; }
+    printf("{:ok true :buttonset %u}\n", mask);
+}
+
+static void cmd_dacmute(int argc, char **argv) {
+    if (argc > 2) {
+        int out = atoi(argv[1]);
+        if (out < 0 || out > 9) { edn_error("output must be 0-9"); return; }
+        int before = sc_read_dac_mute(g_dev, out);
+        kern_return_t kr = sc_write_dac_mute(g_dev, out, atoi(argv[2]) != 0);
+        if (kr != KERN_SUCCESS) { edn_error_code("write failed", kr); return; }
+        printf("{:ok true :output %d :before %d :after %d}\n", out, before, sc_read_dac_mute(g_dev, out));
+    } else {
+        printf("{");
+        for (int i = 0; i < 10; i++) printf("%s%d %d", i ? " " : "", i, sc_read_dac_mute(g_dev, i));
+        printf("}\n");
+    }
 }
 
 static void cmd_mixer(int argc, char **argv) {
@@ -358,6 +401,9 @@ static struct cmd_entry commands[] = {
     {"route",  cmd_route,  1},
     {"bus",    cmd_bus,    1},
     {"mute",   cmd_mute,   1},
+    {"knobset",   cmd_knobset,   1},
+    {"buttonset", cmd_buttonset, 1},
+    {"dacmute",   cmd_dacmute,   1},
     {"mixer",  cmd_mixer,  1},
     {"matrix", cmd_matrix, 1},
     {"dump",   cmd_dump,   1},
@@ -427,6 +473,9 @@ static void usage(void) {
         "  scarlett_ctl route [OUT SRC]\n"
         "  scarlett_ctl bus    [BUS RAW]\n"
         "  scarlett_ctl mute   BUS RAW        (experimental)\n"
+        "  scarlett_ctl knobset MASK          (outputs the front knob attenuates)\n"
+        "  scarlett_ctl buttonset MASK        (outputs front MUTE/DIM act on)\n"
+        "  scarlett_ctl dacmute [OUT 0|1]\n"
         "  scarlett_ctl mixer  [SLOT SRC]\n"
         "  scarlett_ctl matrix [NODE RAW]\n"
         "  scarlett_ctl save confirm\n"

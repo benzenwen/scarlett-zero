@@ -14,6 +14,8 @@ enum Theme {
     static let text = Color.white.opacity(0.92)
     static let secondary = Color.white.opacity(0.56)
     static let tertiary = Color.white.opacity(0.34)
+    /// Controls that are present but inactive (e.g. driven by the front panel).
+    static let disabledOpacity = 0.3
 
     static let mute = Color(red: 1.00, green: 0.30, blue: 0.27)
     static let solo = Color(red: 1.00, green: 0.80, blue: 0.10)

@@ -134,6 +134,45 @@ struct MixEngineTests {
         #expect(MixEngine.buses(for: doc)[4] == 0)  // fixed ignores mute
     }
 
+    @Test func monitorRegistersFollowModesAndHardwareControl() {
+        var doc = MixerDocument.cleared
+        doc.monitor.modes = [.controlled, .controlled, .muted, .fixed, .fixed,
+                             .fixed, .controlled, .fixed, .fixed, .fixed]
+        doc.monitor.levelDB = -30
+        var r = MixEngine.monitorRegisters(for: doc)
+        #expect(r.buttonMask == 0b1000011)
+        #expect(r.knobMask == 0)                       // knob only acts with HW Control
+        #expect(r.dacMute == [false, false, true] + Array(repeating: false, count: 7))
+        #expect(MixEngine.buses(for: doc)[1] == Gain.raw(-30))
+
+        doc.monitor.hardwareControl = true
+        doc.monitor.pad = true
+        doc.monitor.dim = true                         // front panel: firmware applies it
+        r = MixEngine.monitorRegisters(for: doc)
+        #expect(r.knobMask == 0b1000011)
+        let b = MixEngine.buses(for: doc)
+        #expect(b[1] == Gain.raw(-20) && b[7] == 0)    // pad only; no software knob/dim
+        #expect(b[3] == Gain.silenceRaw && b[4] == 0)
+
+        doc.monitor.muteRight = true                   // L/R mutes use the DAC mute
+        r = MixEngine.monitorRegisters(for: doc)
+        #expect(r.dacMute[1] && !r.dacMute[0] && !r.dacMute[3])
+    }
+
+    @Test func version1DocumentsKeepTheFrontKnobLive() throws {
+        var v1 = MixerDocument.cleared
+        v1.version = 1
+        let migrated = v1.migrated()
+        #expect(migrated.version == 2 && migrated.monitor.hardwareControl)
+        #expect(MixEngine.monitorRegisters(for: migrated).knobMask == 0b11)
+        // Output gains don't change: Monitor 1/2 stay at 0 dB.
+        #expect(MixEngine.buses(for: migrated) == MixEngine.buses(for: v1))
+
+        var current = MixerDocument.cleared
+        current.monitor.modes[4] = .controlled
+        #expect(current.migrated() == current)        // v2 untouched
+    }
+
     @Test func hardwareRoundTripsThroughDerivedDocument() {
         var hw = HardwareImage()
         hw.clock = 1

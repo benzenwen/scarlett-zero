@@ -5,7 +5,9 @@ import Foundation
 /// everything richer (pan, mute, solo, stereo link, names, monitor modes) is
 /// software state that `MixEngine` flattens into device writes.
 struct MixerDocument: Codable, Equatable, Sendable {
-    var version = 1
+    /// 2: the monitor section drives the firmware's knob set (mem 0x0a);
+    /// see `migrated()`.
+    var version = 2
     var clock: DeviceMap.Clock = .internal_
     /// Output index (0–19) → source id.
     var routing: [Int] = Array(repeating: SourceID.off, count: DeviceMap.outputCount)
@@ -171,6 +173,23 @@ extension MixerDocument {
 // MARK: - Mutations that keep invariants
 
 extension MixerDocument {
+    /// Version 1 never wrote the firmware's monitor registers, so whatever
+    /// the device's flash held kept the front knob live. Keep it live rather
+    /// than jump outputs to the software level on first connect: turn HW
+    /// Control on, and if nothing was controlled, give the knob Monitor 1/2.
+    func migrated() -> MixerDocument {
+        var doc = self
+        if doc.version < 2 {
+            doc.monitor.hardwareControl = true
+            if !doc.monitor.modes.contains(.controlled) {
+                doc.monitor.modes[0] = .controlled
+                doc.monitor.modes[1] = .controlled
+            }
+            doc.version = 2
+        }
+        return doc
+    }
+
     mutating func setLinked(_ linked: Bool, pair: Int) {
         linkedPairs[pair] = linked
         guard linked else { return }

@@ -121,7 +121,7 @@ final class AppModel {
         case .meters(let frame):
             meters.ingest(frame)
         case .monitor(let m):
-            guard experimental, doc.monitor.hardwareControl else { return }
+            guard doc.monitor.hardwareControl else { return }
             doc.monitor.levelDB = m.levelDB
             doc.monitor.dim = m.dim
             doc.monitor.mute = m.mute
@@ -136,6 +136,9 @@ final class AppModel {
         if MixEngine.matches(doc, hw) {
             console.append(.event, "document matches hardware — kept")
             withoutPush { doc.clock = DeviceMap.Clock(rawValue: hw.clock) ?? doc.clock }
+        } else if !editedOffline, MixEngine.matches(withRouting(of: hw), hw) {
+            console.append(.event, "only routing differs — took the device's routing, kept the mix")
+            withoutPush { doc = withRouting(of: hw) }
         } else if editedOffline {
             console.append(.event, "hardware differs from offline-edited document — asking")
             conflict = hw
@@ -146,6 +149,16 @@ final class AppModel {
         push()
     }
 
+    /// The document with the device's routing and mixer inputs: covers routes
+    /// changed from the CLI without losing pans, links, and stereo pairing.
+    private func withRouting(of hw: HardwareImage) -> MixerDocument {
+        var patched = doc
+        patched.clock = DeviceMap.Clock(rawValue: hw.clock) ?? doc.clock
+        patched.routing = hw.routing
+        for i in patched.inputs.indices { patched.inputs[i].source = hw.mixerInputs[i] }
+        return patched
+    }
+
     private func replaceFromHardware(_ hw: HardwareImage) {
         var derived = MixEngine.document(from: hw)
         // Keep names — they're software-only and harmless to carry over.
@@ -153,6 +166,7 @@ final class AppModel {
         for m in derived.mixes.indices { derived.mixes[m].name = doc.mixes[m].name }
         withoutPush { doc = derived }
         selectedMixBus = 0
+        updatePolling()
     }
 
     /// Conflict resolution: keep what the device has.
@@ -239,7 +253,7 @@ final class AppModel {
     private func updatePolling() {
         session.setPolling(.init(
             meters: experimental,
-            hardwareMonitor: experimental && doc.monitor.hardwareControl,
+            hardwareMonitor: doc.monitor.hardwareControl,
             experimental: experimental))
     }
 
@@ -294,7 +308,7 @@ final class AppModel {
                 load(try LegacySnapshot.load(data), url: nil)
                 notice = "Imported \(url.lastPathComponent). Save to keep it in the new format."
             } else {
-                load(try JSONDecoder().decode(MixerDocument.self, from: data), url: url)
+                load(try JSONDecoder().decode(MixerDocument.self, from: data).migrated(), url: url)
             }
         } catch {
             notice = "Couldn't open \(url.lastPathComponent): \(error.localizedDescription)"
@@ -338,7 +352,7 @@ final class AppModel {
 
     private static func loadAutosave() -> MixerDocument? {
         guard let url = autosaveURL, let data = try? Data(contentsOf: url) else { return nil }
-        return try? JSONDecoder().decode(MixerDocument.self, from: data)
+        return (try? JSONDecoder().decode(MixerDocument.self, from: data))?.migrated()
     }
 
     private func scheduleAutosave() {

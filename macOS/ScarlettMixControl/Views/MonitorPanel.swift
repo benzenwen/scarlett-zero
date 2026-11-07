@@ -6,7 +6,7 @@ struct MonitorPanel: View {
     var body: some View {
         @Bindable var model = model
         let mon = model.doc.monitor
-        let hw = model.experimental && mon.hardwareControl
+        let hw = mon.hardwareControl
 
         VStack(alignment: .leading, spacing: 12) {
             HStack {
@@ -30,15 +30,22 @@ struct MonitorPanel: View {
                 outputGrid
                 VStack(spacing: 6) {
                     LevelKnob(dB: $model.doc.monitor.levelDB, disabled: hw)
+                        // Overlaid above the knob, in the gap under the section
+                        // header, so it takes no layout space and toggling HW
+                        // Control never shifts the row.
+                        .overlay(alignment: .top) {
+                            if hw {
+                                Text("FRONT PANEL")
+                                    .font(.system(size: 8, weight: .heavy))
+                                    .tracking(1)
+                                    .foregroundStyle(Theme.control)
+                                    .fixedSize()
+                                    .offset(y: -13)
+                            }
+                        }
                     Text(mon.levelDB <= MixerDocument.monitorFloorDB ? "−∞ dB" : "\(Int(mon.levelDB)) dB")
                         .font(.system(size: 13, weight: .semibold, design: .monospaced))
                         .foregroundStyle(mon.dim ? Theme.solo : Theme.text)
-                    if hw {
-                        Text("FRONT PANEL")
-                            .font(.system(size: 8, weight: .heavy))
-                            .tracking(1)
-                            .foregroundStyle(Theme.control)
-                    }
                 }
                 .frame(width: 104)
                 VStack(spacing: 5) {
@@ -69,11 +76,11 @@ struct MonitorPanel: View {
                 }
                 .disabled(!model.experimental)
                 LitButton(title: "HW CONTROL", isOn: hw, color: Theme.control, height: 22,
-                          help: model.experimental ? "Follow the front-panel VOLUME knob, DIM and MUTE (experimental)"
-                                                   : "Needs experimental hardware features (Settings)") {
+                          help: "On: the front MONITOR knob, DIM and MUTE act on the blue outputs in the "
+                              + "device itself, even without this app. Off: the knob does nothing and "
+                              + "the level here sets the blue outputs.") {
                     model.setHardwareControl(!mon.hardwareControl)
                 }
-                .disabled(!model.experimental)
             }
         }
         .padding(14)

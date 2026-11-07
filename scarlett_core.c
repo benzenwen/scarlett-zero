@@ -204,6 +204,33 @@ IOReturn sc_write_bus_mute(sc_device *h, int bus, int16_t raw) {
     return write_i16(h, (uint16_t)(0x0100 + bus), 0x0a00, raw);
 }
 
+static IOReturn write_mask(sc_device *h, uint16_t addr, uint32_t mask) {
+    uint8_t buf[4] = { mask & 0xff, (mask >> 8) & 0xff, (mask >> 16) & 0xff, (mask >> 24) & 0xff };
+    return sc_mem_write(h, addr, buf, 4);
+}
+
+IOReturn sc_write_monitor_knob_set(sc_device *h, uint32_t mask) {
+    return write_mask(h, 0x000a, mask & 0x3ff);
+}
+
+IOReturn sc_write_monitor_button_set(sc_device *h, uint32_t mask) {
+    IOReturn r = write_mask(h, 0x000b, mask & 0x3ff);
+    return r != KERN_SUCCESS ? r : write_mask(h, 0x000c, mask & 0x3ff);
+}
+
+IOReturn sc_write_dac_mute(sc_device *h, int output, int muted) {
+    if (output < 0 || output > 9) return kIOReturnBadArgument;
+    uint8_t b = muted ? 1 : 0;
+    return sc_ctl_write(h, (uint16_t)(0x0101 + output), 0x0a00, &b, 1);
+}
+
+int sc_read_dac_mute(sc_device *h, int output) {
+    if (output < 0 || output > 9) return -1;
+    uint8_t b = 0;
+    if (sc_ctl_read(h, (uint16_t)(0x0101 + output), 0x0a00, &b, 1) != KERN_SUCCESS) return -1;
+    return b;
+}
+
 /* ── EXPERIMENTAL ──────────────────────────────────────── */
 
 IOReturn sc_save_to_flash(sc_device *h) {

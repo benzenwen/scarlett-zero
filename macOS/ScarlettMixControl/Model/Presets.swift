@@ -87,7 +87,8 @@ extension MixerDocument {
     /// (`busms=0xFF` → all four mix pairs stereo): Anlg 1–8 and DAW 1/2
     /// (linked) at unity in Mix 1, which feeds L → odd analog outputs and
     /// R → even; the other mixes are faded out; outputs 1–6 follow the
-    /// monitor knob.
+    /// monitor knob. HW Control is on (the file has it off) so the front knob
+    /// keeps working the way it does with no host attached.
     static var factoryDefault: MixerDocument {
         var doc = MixerDocument()
         for i in 0..<8 { doc.inputs[i].source = SourceID.analog0 + i }
@@ -99,6 +100,7 @@ extension MixerDocument {
         for bus in 1..<DeviceMap.mixBusCount { doc.mixes[bus].gainDB = nil }
         for o in Outputs.analog { doc.routing[o] = SourceID.mix0 + o % 2 }
         doc.monitor.modes = (0..<10).map { $0 < 6 ? .controlled : .fixed }
+        doc.monitor.hardwareControl = true
         return doc
     }
 

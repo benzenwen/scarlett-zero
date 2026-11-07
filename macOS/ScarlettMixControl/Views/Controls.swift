@@ -273,7 +273,7 @@ struct LevelKnob: View {
                 .rotationEffect(.degrees(angle))
         }
         .frame(width: 92, height: 92)
-        .opacity(disabled ? 0.55 : 1)
+        .opacity(disabled ? Theme.disabledOpacity : 1)
         .contentShape(Circle())
         .gesture(DragGesture(minimumDistance: 0)
             .onChanged { g in
@@ -298,6 +298,7 @@ struct LevelKnob: View {
 
 /// Compact lit toggle (M / S / PFL / Dim …).
 struct LitButton: View {
+    @Environment(\.isEnabled) private var isEnabled
     let title: String
     var isOn: Bool
     var color: Color
@@ -315,6 +316,7 @@ struct LitButton: View {
                 .background(isOn ? color : Theme.raised, in: .rect(cornerRadius: 5))
                 .overlay(RoundedRectangle(cornerRadius: 5).strokeBorder(isOn ? color.opacity(0.9) : Theme.stroke))
                 .shadow(color: isOn ? color.opacity(0.45) : .clear, radius: 5)
+                .opacity(isEnabled ? 1 : Theme.disabledOpacity)
         }
         .buttonStyle(.plain)
         .help(help ?? title)
