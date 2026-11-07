@@ -1,0 +1,592 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		003F332EEACD62292F231264 /* MixerDocument.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD7A10441F4BD23668C61063 /* MixerDocument.swift */; };
+		0C73F1E2ADE2B46D33972AC9 /* DevicePanel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86A37C89564EFA4C12A1BC12 /* DevicePanel.swift */; };
+		0D21CB6162DA8C6337F2C27B /* ConsoleLog.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC2A3F27E162B8A06526EAED /* ConsoleLog.swift */; };
+		0D5FDCC0A6ADD2C7CC7220E6 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 78373FFC75D94DEC0B637373 /* Assets.xcassets */; };
+		222A72CAD692E0EE433A5C98 /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9CB82D2B9CF43F8CFBD7C81D /* Theme.swift */; };
+		26C19DF7F9D583493CB8217D /* MixerPanel.swift in Sources */ = {isa = PBXBuildFile; fileRef = EB68252AA669EDF5C49A13F4 /* MixerPanel.swift */; };
+		2CF1688932CCC7B2767DD8B4 /* MixerDocument.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD7A10441F4BD23668C61063 /* MixerDocument.swift */; };
+		2F5D6FEF19BAD0139E8CF755 /* MainWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6AF24F0B4C5A7B34C9BFB611 /* MainWindow.swift */; };
+		2F98C161D45C306B0FD731E3 /* DebugSnapshot.swift in Sources */ = {isa = PBXBuildFile; fileRef = BD11E944AF20CE2761F2A886 /* DebugSnapshot.swift */; };
+		33102CE453701E63093B824E /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6F879456750FB1FEC38E043 /* SettingsView.swift */; };
+		3AADB500282F1CDB205D891D /* LegacySnapshot.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1EA062F8B886BE3D9C494F34 /* LegacySnapshot.swift */; };
+		3ED9F5524883CA19EC887747 /* MixEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 193764DF35F04A7F1B9DD451 /* MixEngine.swift */; };
+		4C209A0B1BCFF53189F95DD5 /* MonitorPanel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C19E7AA02DC5ADE422791FF /* MonitorPanel.swift */; };
+		573C380F4B591716C95AA0D0 /* scarlett_core.c in Sources */ = {isa = PBXBuildFile; fileRef = 7CE48E4AE0A898660448F327 /* scarlett_core.c */; };
+		69EA14EBC4FEFAB4469C00BF /* Presets.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4814ADCCB19E324394AC34BC /* Presets.swift */; };
+		7502E1FD97F3BBD796C506DD /* RoutingPanel.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC4111AF53CBFB737A630DD1 /* RoutingPanel.swift */; };
+		78CB79EE35D2C6E1752FC667 /* ConsoleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6413BE78492C0413FC869C79 /* ConsoleView.swift */; };
+		7BA90B101FA43A71823312DC /* MixEngineTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C5280F9EE816A95F3372147 /* MixEngineTests.swift */; };
+		82F4D6C8423670F623383B08 /* AppModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB293D3EB8F9356B9FFA396A /* AppModel.swift */; };
+		884375B5218211D2E289991E /* LegacySnapshot.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1EA062F8B886BE3D9C494F34 /* LegacySnapshot.swift */; };
+		88DF43A2B1B576309B5B0D81 /* DeviceSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C24B64CC8E6B7B24C25ACBB /* DeviceSession.swift */; };
+		8DFCE51CAB484E659EE0119F /* Controls.swift in Sources */ = {isa = PBXBuildFile; fileRef = EBD9223A5500A9D52EBE2BF7 /* Controls.swift */; };
+		B5D1BF7E7A912C86263F6A68 /* DeviceMap.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2035510146C098EFAF9A3AC3 /* DeviceMap.swift */; };
+		B64E0894388C12F0376FD58F /* MeterStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1C501705B469211FA3139E1B /* MeterStore.swift */; };
+		BA998AB184F166B0F38E6015 /* AudioRate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F47ED23E14416DD75245745 /* AudioRate.swift */; };
+		BD1F178900787FEB76B12CB2 /* Presets.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4814ADCCB19E324394AC34BC /* Presets.swift */; };
+		C720C3C02439C58BB5C08595 /* ScarlettMixControlApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 456241C5C2EE832B874F449C /* ScarlettMixControlApp.swift */; };
+		C75F9666A8058CB5CEC1C5E6 /* SourceMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5EE43F00CAF19C6167E42961 /* SourceMenu.swift */; };
+		CB447AEA63B1D7C61D99350C /* MixEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 193764DF35F04A7F1B9DD451 /* MixEngine.swift */; };
+		D4B9F5CFB5FABFCE51F8C02F /* Gain.swift in Sources */ = {isa = PBXBuildFile; fileRef = F3AD5E27AE6039A9583077B0 /* Gain.swift */; };
+		E998418D6705A9870576774B /* DeviceMap.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2035510146C098EFAF9A3AC3 /* DeviceMap.swift */; };
+		FCB092C74DC509B35AC70C58 /* Gain.swift in Sources */ = {isa = PBXBuildFile; fileRef = F3AD5E27AE6039A9583077B0 /* Gain.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		0C19E7AA02DC5ADE422791FF /* MonitorPanel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MonitorPanel.swift; sourceTree = "<group>"; };
+		0C24B64CC8E6B7B24C25ACBB /* DeviceSession.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceSession.swift; sourceTree = "<group>"; };
+		0C5280F9EE816A95F3372147 /* MixEngineTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MixEngineTests.swift; sourceTree = "<group>"; };
+		18FCF84BD9264C28C93F98C1 /* ScarlettMixControlTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ScarlettMixControlTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		193764DF35F04A7F1B9DD451 /* MixEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MixEngine.swift; sourceTree = "<group>"; };
+		1C501705B469211FA3139E1B /* MeterStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MeterStore.swift; sourceTree = "<group>"; };
+		1EA062F8B886BE3D9C494F34 /* LegacySnapshot.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LegacySnapshot.swift; sourceTree = "<group>"; };
+		2035510146C098EFAF9A3AC3 /* DeviceMap.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceMap.swift; sourceTree = "<group>"; };
+		456241C5C2EE832B874F449C /* ScarlettMixControlApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScarlettMixControlApp.swift; sourceTree = "<group>"; };
+		4814ADCCB19E324394AC34BC /* Presets.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Presets.swift; sourceTree = "<group>"; };
+		556813E9C64F1E9D70EFA6B1 /* ScarlettMixControl.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ScarlettMixControl.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		56145ACA515ED14F1876DAEE /* scarlett_core.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = scarlett_core.h; path = ../scarlett_core.h; sourceTree = "<group>"; };
+		5EE43F00CAF19C6167E42961 /* SourceMenu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SourceMenu.swift; sourceTree = "<group>"; };
+		5F47ED23E14416DD75245745 /* AudioRate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioRate.swift; sourceTree = "<group>"; };
+		6413BE78492C0413FC869C79 /* ConsoleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConsoleView.swift; sourceTree = "<group>"; };
+		6AF24F0B4C5A7B34C9BFB611 /* MainWindow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainWindow.swift; sourceTree = "<group>"; };
+		78373FFC75D94DEC0B637373 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		78D59EA8132C0AF52626F3A2 /* ScarlettMixControl-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "ScarlettMixControl-Bridging-Header.h"; sourceTree = "<group>"; };
+		7CE48E4AE0A898660448F327 /* scarlett_core.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = scarlett_core.c; path = ../scarlett_core.c; sourceTree = "<group>"; };
+		86A37C89564EFA4C12A1BC12 /* DevicePanel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DevicePanel.swift; sourceTree = "<group>"; };
+		9CB82D2B9CF43F8CFBD7C81D /* Theme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Theme.swift; sourceTree = "<group>"; };
+		BC2A3F27E162B8A06526EAED /* ConsoleLog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConsoleLog.swift; sourceTree = "<group>"; };
+		BD11E944AF20CE2761F2A886 /* DebugSnapshot.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DebugSnapshot.swift; sourceTree = "<group>"; };
+		DC4111AF53CBFB737A630DD1 /* RoutingPanel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoutingPanel.swift; sourceTree = "<group>"; };
+		EB68252AA669EDF5C49A13F4 /* MixerPanel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MixerPanel.swift; sourceTree = "<group>"; };
+		EBD9223A5500A9D52EBE2BF7 /* Controls.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Controls.swift; sourceTree = "<group>"; };
+		F3AD5E27AE6039A9583077B0 /* Gain.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Gain.swift; sourceTree = "<group>"; };
+		F6F879456750FB1FEC38E043 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		FB293D3EB8F9356B9FFA396A /* AppModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppModel.swift; sourceTree = "<group>"; };
+		FD7A10441F4BD23668C61063 /* MixerDocument.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MixerDocument.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXGroup section */
+		04273522FC4D76327937CE59 /* .claude */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = .claude;
+			sourceTree = "<group>";
+		};
+		1ED6B8A22BA037B84457D66B /* .claude */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = .claude;
+			sourceTree = "<group>";
+		};
+		2C4ACE6A145AE1C3941A0938 /* ScarlettMixControlTests */ = {
+			isa = PBXGroup;
+			children = (
+				0C5280F9EE816A95F3372147 /* MixEngineTests.swift */,
+			);
+			path = ScarlettMixControlTests;
+			sourceTree = "<group>";
+		};
+		44A9ACF4011D06391CEA112F /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				6413BE78492C0413FC869C79 /* ConsoleView.swift */,
+				EBD9223A5500A9D52EBE2BF7 /* Controls.swift */,
+				86A37C89564EFA4C12A1BC12 /* DevicePanel.swift */,
+				6AF24F0B4C5A7B34C9BFB611 /* MainWindow.swift */,
+				EB68252AA669EDF5C49A13F4 /* MixerPanel.swift */,
+				0C19E7AA02DC5ADE422791FF /* MonitorPanel.swift */,
+				DC4111AF53CBFB737A630DD1 /* RoutingPanel.swift */,
+				F6F879456750FB1FEC38E043 /* SettingsView.swift */,
+				5EE43F00CAF19C6167E42961 /* SourceMenu.swift */,
+				9CB82D2B9CF43F8CFBD7C81D /* Theme.swift */,
+				04273522FC4D76327937CE59 /* .claude */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		5F94BD10BD1E3361B9132403 /* ScarlettMixControl */ = {
+			isa = PBXGroup;
+			children = (
+				78373FFC75D94DEC0B637373 /* Assets.xcassets */,
+				EA51B95812D583C7CA4A5D8D /* .claude */,
+				7D781C382D80059A90BE54A7 /* App */,
+				85CB22F670856727388FD6BE /* Hardware */,
+				88BB35E0F3F4619821086083 /* Model */,
+				44A9ACF4011D06391CEA112F /* Views */,
+			);
+			path = ScarlettMixControl;
+			sourceTree = "<group>";
+		};
+		6FBDAFEB64C271D0DAD76AED = {
+			isa = PBXGroup;
+			children = (
+				5F94BD10BD1E3361B9132403 /* ScarlettMixControl */,
+				2C4ACE6A145AE1C3941A0938 /* ScarlettMixControlTests */,
+				DAA149081BA7331A3E95DC55 /* Transport */,
+				B3C9A7638AF9E286AA727840 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		7D781C382D80059A90BE54A7 /* App */ = {
+			isa = PBXGroup;
+			children = (
+				FB293D3EB8F9356B9FFA396A /* AppModel.swift */,
+				BC2A3F27E162B8A06526EAED /* ConsoleLog.swift */,
+				BD11E944AF20CE2761F2A886 /* DebugSnapshot.swift */,
+				1C501705B469211FA3139E1B /* MeterStore.swift */,
+				456241C5C2EE832B874F449C /* ScarlettMixControlApp.swift */,
+				1ED6B8A22BA037B84457D66B /* .claude */,
+			);
+			path = App;
+			sourceTree = "<group>";
+		};
+		85CB22F670856727388FD6BE /* Hardware */ = {
+			isa = PBXGroup;
+			children = (
+				5F47ED23E14416DD75245745 /* AudioRate.swift */,
+				0C24B64CC8E6B7B24C25ACBB /* DeviceSession.swift */,
+				78D59EA8132C0AF52626F3A2 /* ScarlettMixControl-Bridging-Header.h */,
+				BEA61C10D551A29696C5FC68 /* .claude */,
+			);
+			path = Hardware;
+			sourceTree = "<group>";
+		};
+		88BB35E0F3F4619821086083 /* Model */ = {
+			isa = PBXGroup;
+			children = (
+				2035510146C098EFAF9A3AC3 /* DeviceMap.swift */,
+				F3AD5E27AE6039A9583077B0 /* Gain.swift */,
+				1EA062F8B886BE3D9C494F34 /* LegacySnapshot.swift */,
+				193764DF35F04A7F1B9DD451 /* MixEngine.swift */,
+				FD7A10441F4BD23668C61063 /* MixerDocument.swift */,
+				4814ADCCB19E324394AC34BC /* Presets.swift */,
+				BE7AC5C45BD147265214376D /* .claude */,
+			);
+			path = Model;
+			sourceTree = "<group>";
+		};
+		B3C9A7638AF9E286AA727840 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				556813E9C64F1E9D70EFA6B1 /* ScarlettMixControl.app */,
+				18FCF84BD9264C28C93F98C1 /* ScarlettMixControlTests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		BE7AC5C45BD147265214376D /* .claude */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = .claude;
+			sourceTree = "<group>";
+		};
+		BEA61C10D551A29696C5FC68 /* .claude */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = .claude;
+			sourceTree = "<group>";
+		};
+		DAA149081BA7331A3E95DC55 /* Transport */ = {
+			isa = PBXGroup;
+			children = (
+				7CE48E4AE0A898660448F327 /* scarlett_core.c */,
+				56145ACA515ED14F1876DAEE /* scarlett_core.h */,
+			);
+			name = Transport;
+			sourceTree = "<group>";
+		};
+		EA51B95812D583C7CA4A5D8D /* .claude */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = .claude;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		D868189EAECA4F2C62FC1070 /* ScarlettMixControl */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 9278DA5EEB607765E999056A /* Build configuration list for PBXNativeTarget "ScarlettMixControl" */;
+			buildPhases = (
+				D5EFDB929700A9F7091705D4 /* Sources */,
+				33C31A11FD44AAAD5C408D3F /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = ScarlettMixControl;
+			packageProductDependencies = (
+			);
+			productName = ScarlettMixControl;
+			productReference = 556813E9C64F1E9D70EFA6B1 /* ScarlettMixControl.app */;
+			productType = "com.apple.product-type.application";
+		};
+		E60EAB5EE083F134ED86EE99 /* ScarlettMixControlTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = F4620D75F0D2D6D5EC6A4D12 /* Build configuration list for PBXNativeTarget "ScarlettMixControlTests" */;
+			buildPhases = (
+				5ADB525F77EE03E81905983F /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = ScarlettMixControlTests;
+			packageProductDependencies = (
+			);
+			productName = ScarlettMixControlTests;
+			productReference = 18FCF84BD9264C28C93F98C1 /* ScarlettMixControlTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		362278136452DF121512BE3E /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = YES;
+				LastUpgradeCheck = 1430;
+				TargetAttributes = {
+					D868189EAECA4F2C62FC1070 = {
+						ProvisioningStyle = Automatic;
+					};
+				};
+			};
+			buildConfigurationList = 5890EC45BBF6EBAF6C75495E /* Build configuration list for PBXProject "ScarlettMixControl" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				Base,
+				en,
+			);
+			mainGroup = 6FBDAFEB64C271D0DAD76AED;
+			minimizedProjectReferenceProxies = 1;
+			preferredProjectObjectVersion = 77;
+			productRefGroup = B3C9A7638AF9E286AA727840 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				D868189EAECA4F2C62FC1070 /* ScarlettMixControl */,
+				E60EAB5EE083F134ED86EE99 /* ScarlettMixControlTests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		33C31A11FD44AAAD5C408D3F /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				0D5FDCC0A6ADD2C7CC7220E6 /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		5ADB525F77EE03E81905983F /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				E998418D6705A9870576774B /* DeviceMap.swift in Sources */,
+				D4B9F5CFB5FABFCE51F8C02F /* Gain.swift in Sources */,
+				884375B5218211D2E289991E /* LegacySnapshot.swift in Sources */,
+				3ED9F5524883CA19EC887747 /* MixEngine.swift in Sources */,
+				7BA90B101FA43A71823312DC /* MixEngineTests.swift in Sources */,
+				003F332EEACD62292F231264 /* MixerDocument.swift in Sources */,
+				BD1F178900787FEB76B12CB2 /* Presets.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		D5EFDB929700A9F7091705D4 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				82F4D6C8423670F623383B08 /* AppModel.swift in Sources */,
+				BA998AB184F166B0F38E6015 /* AudioRate.swift in Sources */,
+				0D21CB6162DA8C6337F2C27B /* ConsoleLog.swift in Sources */,
+				78CB79EE35D2C6E1752FC667 /* ConsoleView.swift in Sources */,
+				8DFCE51CAB484E659EE0119F /* Controls.swift in Sources */,
+				2F98C161D45C306B0FD731E3 /* DebugSnapshot.swift in Sources */,
+				B5D1BF7E7A912C86263F6A68 /* DeviceMap.swift in Sources */,
+				0C73F1E2ADE2B46D33972AC9 /* DevicePanel.swift in Sources */,
+				88DF43A2B1B576309B5B0D81 /* DeviceSession.swift in Sources */,
+				FCB092C74DC509B35AC70C58 /* Gain.swift in Sources */,
+				3AADB500282F1CDB205D891D /* LegacySnapshot.swift in Sources */,
+				2F5D6FEF19BAD0139E8CF755 /* MainWindow.swift in Sources */,
+				B64E0894388C12F0376FD58F /* MeterStore.swift in Sources */,
+				CB447AEA63B1D7C61D99350C /* MixEngine.swift in Sources */,
+				2CF1688932CCC7B2767DD8B4 /* MixerDocument.swift in Sources */,
+				26C19DF7F9D583493CB8217D /* MixerPanel.swift in Sources */,
+				4C209A0B1BCFF53189F95DD5 /* MonitorPanel.swift in Sources */,
+				69EA14EBC4FEFAB4469C00BF /* Presets.swift in Sources */,
+				7502E1FD97F3BBD796C506DD /* RoutingPanel.swift in Sources */,
+				C720C3C02439C58BB5C08595 /* ScarlettMixControlApp.swift in Sources */,
+				33102CE453701E63093B824E /* SettingsView.swift in Sources */,
+				C75F9666A8058CB5CEC1C5E6 /* SourceMenu.swift in Sources */,
+				222A72CAD692E0EE433A5C98 /* Theme.swift in Sources */,
+				573C380F4B591716C95AA0D0 /* scarlett_core.c in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		046649DD2C3ED17973492A58 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 26.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 6.0;
+			};
+			name = Release;
+		};
+		41FFDB81F73D892C2725E4E0 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_IDENTITY = "-";
+				COMBINE_HIDPI_IMAGES = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@loader_path/../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.benwen.ScarlettMixControlTests;
+				SDKROOT = macosx;
+			};
+			name = Release;
+		};
+		68E84B9F88A8BDBCCABE436C /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
+					"DEBUG=1",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 26.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 6.0;
+			};
+			name = Debug;
+		};
+		77A424C6973BE233D9359B36 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_IDENTITY = "-";
+				COMBINE_HIDPI_IMAGES = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@loader_path/../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.benwen.ScarlettMixControlTests;
+				SDKROOT = macosx;
+			};
+			name = Debug;
+		};
+		C008DCA98CD23698810DD097 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "-";
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				ENABLE_APP_SANDBOX = NO;
+				ENABLE_HARDENED_RUNTIME = NO;
+				GENERATE_INFOPLIST_FILE = YES;
+				HEADER_SEARCH_PATHS = "$(SRCROOT)/..";
+				INFOPLIST_KEY_CFBundleDisplayName = "Scarlett MixControl";
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.music";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright 2026 Ben Wen.";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MARKETING_VERSION = 0.1.0;
+				OTHER_LDFLAGS = "-framework IOKit -framework CoreFoundation";
+				PRODUCT_BUNDLE_IDENTIFIER = com.benwen.ScarlettMixControl;
+				PRODUCT_NAME = "Scarlett MixControl";
+				SDKROOT = macosx;
+				SWIFT_OBJC_BRIDGING_HEADER = "ScarlettMixControl/Hardware/ScarlettMixControl-Bridging-Header.h";
+			};
+			name = Release;
+		};
+		FF2CA3F2CC5A4DE2F8AEECDE /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "-";
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				ENABLE_APP_SANDBOX = NO;
+				ENABLE_HARDENED_RUNTIME = NO;
+				GENERATE_INFOPLIST_FILE = YES;
+				HEADER_SEARCH_PATHS = "$(SRCROOT)/..";
+				INFOPLIST_KEY_CFBundleDisplayName = "Scarlett MixControl";
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.music";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright 2026 Ben Wen.";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MARKETING_VERSION = 0.1.0;
+				OTHER_LDFLAGS = "-framework IOKit -framework CoreFoundation";
+				PRODUCT_BUNDLE_IDENTIFIER = com.benwen.ScarlettMixControl;
+				PRODUCT_NAME = "Scarlett MixControl";
+				SDKROOT = macosx;
+				SWIFT_OBJC_BRIDGING_HEADER = "ScarlettMixControl/Hardware/ScarlettMixControl-Bridging-Header.h";
+			};
+			name = Debug;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		5890EC45BBF6EBAF6C75495E /* Build configuration list for PBXProject "ScarlettMixControl" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				68E84B9F88A8BDBCCABE436C /* Debug */,
+				046649DD2C3ED17973492A58 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		9278DA5EEB607765E999056A /* Build configuration list for PBXNativeTarget "ScarlettMixControl" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				FF2CA3F2CC5A4DE2F8AEECDE /* Debug */,
+				C008DCA98CD23698810DD097 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		F4620D75F0D2D6D5EC6A4D12 /* Build configuration list for PBXNativeTarget "ScarlettMixControlTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				77A424C6973BE233D9359B36 /* Debug */,
+				41FFDB81F73D892C2725E4E0 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 362278136452DF121512BE3E /* Project object */;
+}

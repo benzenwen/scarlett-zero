@@ -12,10 +12,46 @@ architecture. Use at your own risk.
 
 ## Architecture
 
-The core functionality is in a C file scarlett_ctl.c that reads and
-writes to the 18i20.
+The USB transport lives in scarlett_core.c / scarlett_core.h: a small
+C library that opens the 18i20 through IOKit and reads and writes its
+controls. Two front ends share it:
 
-An optional Clojure Babashka program wraps the scarlet_ctl program. 
+* scarlett_ctl.c, the command line tool (and daemon), and
+* macOS/, a native SwiftUI app that recreates Scarlett MixControl.
+
+An optional Clojure Babashka program wraps the scarlett_ctl program.
+
+## macOS app: Scarlett MixControl
+
+A modern replacement for Focusrite's defunct MixControl, laid out the
+same way: one window with the Mixer on top and the Routing, Device
+and Monitor sections below.
+
+* Mixer: 8 mix buses as mono or stereo mixes (tabs), 18 channel
+  strips with source, pan/balance, fader, mute, solo, PFL and stereo
+  link, and a mix output strip with destinations, Copy To…, and Stereo.
+* Routing: all 20 outputs with MixControl's routing presets.
+* Monitor: per-output controlled/muted/fixed buttons, level knob,
+  Dim, Mute, L/R mute, pad, monitor presets.
+* Device: connection, sample rate, sync source; "Release for CLI"
+  hands the USB device to scarlett_ctl without quitting.
+* File: Open/Save snapshots (.scarlettmix JSON), import legacy
+  MixControl .18i20 files, Restore Factory Defaults, Clear All.
+
+Connecting never writes to the device. Unverified hardware commands
+(meters, front-panel HW Control, mono, Save to Hardware) sit behind
+Settings ▸ "Enable experimental hardware features", off by default.
+
+Build: open macOS/ScarlettMixControl.xcodeproj in Xcode and run, or
+
+```
+cd macOS
+xcodegen            # only after editing project.yml
+xcodebuild -scheme ScarlettMixControl -derivedDataPath build/DerivedData build
+xcodebuild -scheme ScarlettMixControl -derivedDataPath build/DerivedData test
+```
+
+The app and scarlett_ctl can't hold the device at the same time.
 
 ## C program scarlett_ctl
 
@@ -83,11 +119,18 @@ Outputs use keywords; e.g. :mon-l, :daw-1, :anlg-3, :spdif-l,
 * Mixer input research and testing: The input values are guesses. 
 * Write to non-volatile memory
 * Testing
-* Native app
+* Verify the experimental commands (meters, HW Control, mono, save)
 
 ## Build notes
 
-Built and tested on macOS Tahoe 26.3 with Apple clang version 17.0.0 (clang-1700.6.4.2)
+Build the CLI with:
+
+```
+cc -o scarlett_ctl scarlett_ctl.c scarlett_core.c -framework IOKit -framework CoreFoundation
+```
+
+Built and tested on macOS Tahoe 26.3 with Apple clang version 17.0.0 (clang-1700.6.4.2).
+The macOS app was built with Xcode 27 on macOS 26.6.
 The binary is provided for my convenience.
 
 scarlett-18i20-project-brief.md is the Claude design doc
