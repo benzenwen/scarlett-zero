@@ -148,13 +148,13 @@ extension MixerDocument {
     }
 
     /// Source label, resolving mix ids against names and stereo pairing:
-    /// "Mix 1 (L)", "Monitor Mix (R)".
+    /// "Mix 1+2 L", "Monitor Mix R" (short enough for the routing pills).
     func sourceLabel(_ id: Int) -> String {
         guard case .mix(let bus) = SourceKind(id: id) else { return SourceKind(id: id).label }
         let slot = slot(containing: bus)
         let name = mixName(slot)
         guard slot.stereo else { return name }
-        return "\(name) (\(bus == slot.bus ? "L" : "R"))"
+        return "\(name) \(bus == slot.bus ? "L" : "R")"
     }
 
     /// Outputs currently fed by a given mix bus.

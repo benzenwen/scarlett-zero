@@ -179,7 +179,7 @@ struct StructureTests {
         #expect(doc.sourceLabel(39) == "Mix 2")
         doc.setStereo(true, mixPair: 0)
         doc.mixes[0].name = "Cue"
-        #expect(doc.sourceLabel(39) == "Cue (R)")
+        #expect(doc.sourceLabel(39) == "Cue R")
     }
 
     @Test func automaticMixNamesFollowStereoLink() {
@@ -188,7 +188,7 @@ struct StructureTests {
         #expect(doc.mixName(doc.slot(containing: 0)) == "Mix 1")
         doc.setStereo(true, mixPair: 0)
         #expect(doc.mixName(doc.slot(containing: 0)) == "Mix 1+2")
-        #expect(doc.sourceLabel(39) == "Mix 1+2 (R)")
+        #expect(doc.sourceLabel(39) == "Mix 1+2 R")
         doc.mixes[0].name = "Cue"
         doc.setStereo(false, mixPair: 0)
         #expect(doc.mixName(doc.slot(containing: 0)) == "Cue")
