@@ -154,12 +154,15 @@ private struct MixLinkButton: View {
 
     var body: some View {
         Button(action: action) {
-            Image(systemName: linked ? "link" : "link")
+            Image(systemName: "link")
                 .font(.system(size: 10, weight: .bold))
                 .foregroundStyle(linked ? accent : Theme.tertiary)
                 .frame(width: 22, height: 22)
                 .background(linked ? accent.opacity(0.18) : .clear, in: .circle)
                 .overlay(Circle().strokeBorder(linked ? accent.opacity(0.5) : Theme.stroke))
+                // Plain buttons only hit-test drawn pixels; without this the
+                // unlinked state is clickable only on the glyph and ring.
+                .contentShape(.circle)
         }
         .buttonStyle(.plain)
         .help(linked ? "Split back into mono Mix \(bus + 1) and Mix \(bus + 2)"
@@ -256,11 +259,12 @@ struct ChannelStripView: View {
                 Button {
                     model.doc.setLinked(!strip.linked, pair: strip.channel / 2)
                 } label: {
-                    Image(systemName: strip.linked ? "link" : "link")
+                    Image(systemName: "link")
                         .font(.system(size: 9, weight: .bold))
                         .foregroundStyle(strip.linked ? accent : Theme.tertiary)
                         .frame(width: 20, height: 16)
                         .background(strip.linked ? accent.opacity(0.18) : .clear, in: .rect(cornerRadius: 4))
+                        .contentShape(.rect(cornerRadius: 4))   // whole button, not just the glyph
                 }
                 .buttonStyle(.plain)
                 .help(strip.linked ? "Unlink stereo pair" : "Link \(strip.channel + 1) and \(strip.channel + 2) as a stereo pair")

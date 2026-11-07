@@ -44,6 +44,7 @@ struct ConsoleView: View {
                         .padding(.vertical, 3)
                         .background(on ? Self.color(kind).opacity(0.14) : .clear, in: .capsule)
                         .overlay(Capsule().strokeBorder(on ? Self.color(kind).opacity(0.5) : Theme.stroke))
+                        .contentShape(.capsule)
                 }
                 .buttonStyle(.plain)
             }
