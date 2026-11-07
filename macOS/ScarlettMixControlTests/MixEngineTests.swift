@@ -182,6 +182,20 @@ struct StructureTests {
         #expect(doc.sourceLabel(39) == "Cue (R)")
     }
 
+    @Test func automaticMixNamesFollowStereoLink() {
+        var doc = MixerDocument.cleared
+        doc.mixes[0].name = "Mix 1+2"   // as imported from MixControl
+        #expect(doc.mixName(doc.slot(containing: 0)) == "Mix 1")
+        doc.setStereo(true, mixPair: 0)
+        #expect(doc.mixName(doc.slot(containing: 0)) == "Mix 1+2")
+        #expect(doc.sourceLabel(39) == "Mix 1+2 (R)")
+        doc.mixes[0].name = "Cue"
+        doc.setStereo(false, mixPair: 0)
+        #expect(doc.mixName(doc.slot(containing: 0)) == "Cue")
+        #expect(MixerDocument.isAutomaticMixName("Mix 3 + 4"))
+        #expect(!MixerDocument.isAutomaticMixName("Mix Bob"))
+    }
+
     @Test func presets() {
         var doc = MixerDocument.cleared
         RoutingPreset.mixing.apply(to: &doc)

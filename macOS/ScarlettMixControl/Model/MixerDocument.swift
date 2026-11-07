@@ -125,8 +125,20 @@ extension MixerDocument {
 
     func mixName(_ slot: MixSlot) -> String {
         let custom = mixes[slot.bus].name
-        if !custom.isEmpty { return custom }
-        return "Mix \(slot.bus + 1)"
+        if !Self.isAutomaticMixName(custom) { return custom }
+        return defaultMixName(slot)
+    }
+
+    /// "Mix 3" mono, "Mix 3+4" stereo — MixControl's convention.
+    func defaultMixName(_ slot: MixSlot) -> String {
+        slot.stereo ? "Mix \(slot.bus + 1)+\(slot.bus + 2)" : "Mix \(slot.bus + 1)"
+    }
+
+    /// Empty, or a name MixControl generated ("Mix 3", "Mix 3+4"). These track
+    /// the stereo link instead of sticking as custom names.
+    static func isAutomaticMixName(_ name: String) -> Bool {
+        let trimmed = name.trimmingCharacters(in: .whitespaces)
+        return trimmed.isEmpty || trimmed.wholeMatch(of: /Mix \d+(\s*\+\s*\d+)?/) != nil
     }
 
     func stripName(_ strip: Strip) -> String {

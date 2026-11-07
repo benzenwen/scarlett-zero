@@ -94,7 +94,8 @@ enum LegacySnapshot {
 
         for mix in mixer.elements(path: "mixes/mix") {
             guard let m = Int(mix.attr("m")), m < DeviceMap.mixBusCount else { continue }
-            doc.mixes[m].name = mix.attr("name")
+            let name = mix.attr("name")
+            doc.mixes[m].name = MixerDocument.isAutomaticMixName(name) ? "" : name
             doc.mixes[m].mute = mix.attr("mute") == "1"
             doc.mixes[m].gainDB = MixControlFaderLaw.dB(Double(mix.attr("gain")) ?? 0)
             for chan in mix.elements(path: "chans/chan") {

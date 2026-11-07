@@ -289,6 +289,16 @@ struct MixOutputStrip: View {
     private var mix: Binding<MixerDocument.Mix> {
         Binding(get: { model.doc.mixes[slot.bus] }, set: { model.doc.mixes[slot.bus] = $0 })
     }
+    /// Automatic names ("Mix 1", "Mix 1+2") show as the placeholder so they
+    /// follow the stereo link; typing one back in clears the custom name.
+    private var customName: Binding<String> {
+        Binding(get: {
+            let name = model.doc.mixes[slot.bus].name
+            return MixerDocument.isAutomaticMixName(name) ? "" : name
+        }, set: {
+            model.doc.mixes[slot.bus].name = MixerDocument.isAutomaticMixName($0) ? "" : $0
+        })
+    }
 
     var body: some View {
         @Bindable var model = model
@@ -344,7 +354,7 @@ struct MixOutputStrip: View {
                     model.listen = listening ? nil : .mix(slot.bus)
                 }
             }
-            TextField("Mix \(slot.bus + 1)", text: mix.name)
+            TextField(model.doc.defaultMixName(slot), text: customName)
                 .textFieldStyle(.plain)
                 .font(.system(size: 11, weight: .bold))
                 .multilineTextAlignment(.center)
