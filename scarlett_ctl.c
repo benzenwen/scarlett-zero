@@ -31,7 +31,7 @@
  * on the Babashka side. Gain values: 0x0000 = 0 dB, 0x8000 = silence.
  *
  * Compile:
- *   cc -o scarlett_ctl scarlett_ctl.c -framework IOKit -framework CoreFoundation
+ *   cc -o scarlett_ctl scarlett_ctl.c scarlett_core.c -framework IOKit -framework CoreFoundation
  *
  * Copyright 2026 Ben Wen. All rights reserved.
  */
@@ -40,145 +40,37 @@
 #include <stdlib.h>
 #include <string.h>
 #include <signal.h>
-#include <IOKit/IOKitLib.h>
-#include <IOKit/usb/IOUSBLib.h>
-#include <IOKit/IOCFPlugIn.h>
-#include <CoreFoundation/CoreFoundation.h>
+#include "scarlett_core.h"
 
-#define VENDOR_ID  0x1235
-#define PRODUCT_ID 0x800c
-
-#define NUM_OUTPUTS     20
-#define NUM_BUSES       21
-#define NUM_MIXER_INS   18
-#define MATRIX_NODES    144  /* 18 inputs × 8 mix buses, indices 0–143 */
+#define NUM_OUTPUTS     SC_NUM_OUTPUTS
+#define NUM_BUSES       SC_NUM_BUSES
+#define NUM_MIXER_INS   SC_NUM_MIXER_INS
+#define MATRIX_NODES    SC_MATRIX_NODES
 
 /* ── Device handle ─────────────────────────────────────── */
 
-static IOUSBDeviceInterface **g_dev = NULL;
-static volatile sig_atomic_t   g_quit = 0;
+static sc_device             *g_dev = NULL;
+static volatile sig_atomic_t  g_quit = 0;
 
-static int device_open(void) {
-    CFMutableDictionaryRef match = IOServiceMatching("IOUSBHostDevice");
-    if (!match) return -1;
-
-    CFDictionarySetValue(match, CFSTR("idVendor"),
-        CFNumberCreate(NULL, kCFNumberSInt32Type, &(int32_t){VENDOR_ID}));
-    CFDictionarySetValue(match, CFSTR("idProduct"),
-        CFNumberCreate(NULL, kCFNumberSInt32Type, &(int32_t){PRODUCT_ID}));
-
-    io_service_t svc = IOServiceGetMatchingService(kIOMainPortDefault, match);
-    if (!svc) return -1;
-
-    IOCFPlugInInterface **plug = NULL;
-    SInt32 score;
-    kern_return_t kr = IOCreatePlugInInterfaceForService(svc,
-        kIOUSBDeviceUserClientTypeID, kIOCFPlugInInterfaceID, &plug, &score);
-    IOObjectRelease(svc);
-    if (kr != KERN_SUCCESS || !plug) return -2;
-
-    (*plug)->QueryInterface(plug,
-        CFUUIDGetUUIDBytes(kIOUSBDeviceInterfaceID), (LPVOID *)&g_dev);
-    (*plug)->Release(plug);
-    if (!g_dev) return -3;
-
-    kr = (*g_dev)->USBDeviceOpen(g_dev);
-    if (kr != KERN_SUCCESS) return -4;
-
-    return 0;
-}
+static int device_open(void) { return sc_open(&g_dev); }
 
 static void device_close(void) {
-    if (g_dev) {
-        (*g_dev)->USBDeviceClose(g_dev);
-        (*g_dev)->Release(g_dev);
-        g_dev = NULL;
-    }
+    sc_close(g_dev);
+    g_dev = NULL;
 }
 
-/* ── Low-level read/write ──────────────────────────────── */
+/* ── Read/write helpers (thin names over scarlett_core) ── */
 
-static kern_return_t ctl_read(uint16_t wValue, uint16_t wIndex,
-                              uint8_t *buf, uint16_t len) {
-    IOUSBDevRequest req = {
-        .bmRequestType = 0xA1, .bRequest = 0x01,
-        .wValue = wValue, .wIndex = wIndex,
-        .wLength = len, .pData = buf
-    };
-    return (*g_dev)->DeviceRequest(g_dev, &req);
-}
-
-static kern_return_t ctl_write(uint16_t wValue, uint16_t wIndex,
-                               uint8_t *buf, uint16_t len) {
-    IOUSBDevRequest req = {
-        .bmRequestType = 0x21, .bRequest = 0x01,
-        .wValue = wValue, .wIndex = wIndex,
-        .wLength = len, .pData = buf
-    };
-    return (*g_dev)->DeviceRequest(g_dev, &req);
-}
-
-/* ── Read helpers ──────────────────────────────────────── */
-
-static int read_clock_source(void) {
-    uint8_t buf = 0;
-    if (ctl_read(0x0100, 0x2800, &buf, 1) != KERN_SUCCESS) return -1;
-    return buf;
-}
-
-static int read_sample_rate(void) {
-    uint8_t buf[4] = {0};
-    if (ctl_read(0x0100, 0x2900, buf, 4) != KERN_SUCCESS) return -1;
-    return buf[0] | (buf[1] << 8) | (buf[2] << 16) | (buf[3] << 24);
-}
-
-static int read_route(int output) {
-    uint8_t buf[2] = {0};
-    if (ctl_read(output, 0x3300, buf, 2) != KERN_SUCCESS) return -1;
-    return buf[0];
-}
-
-static int read_bus_volume(int bus) {
-    uint8_t buf[2] = {0};
-    if (ctl_read(0x0200 + bus, 0x0a00, buf, 2) != KERN_SUCCESS) return -9999;
-    return (int16_t)(buf[0] | (buf[1] << 8));
-}
-
-static int read_bus_mute(int bus) {
-    uint8_t buf[2] = {0};
-    if (ctl_read(0x0100 + bus, 0x0a00, buf, 2) != KERN_SUCCESS) return -9999;
-    return (int16_t)(buf[0] | (buf[1] << 8));
-}
-
-static int read_mixer_input(int slot) {
-    uint8_t buf[2] = {0};
-    if (ctl_read(0x0600 + slot, 0x3200, buf, 2) != KERN_SUCCESS) return -1;
-    return buf[0];
-}
-
-static int read_matrix_gain(int node) {
-    uint8_t buf[2] = {0};
-    kern_return_t kr = ctl_read(node, 0x3c00, buf, 2);
-    if (kr != KERN_SUCCESS) return -99999;
-    return (int16_t)(buf[0] | (buf[1] << 8));
-}
-
-/* ── Write helpers ─────────────────────────────────────── */
-
-static kern_return_t write_bus_volume(int bus, int16_t val) {
-    uint8_t buf[2] = {(uint8_t)(val & 0xff), (uint8_t)((val >> 8) & 0xff)};
-    return ctl_write(0x0200 + bus, 0x0a00, buf, 2);
-}
-
-static kern_return_t write_mixer_input(int slot, int src_id) {
-    uint8_t buf[2] = {(uint8_t)(src_id & 0xff), 0x00};
-    return ctl_write(0x0600 + slot, 0x3200, buf, 2);
-}
-
-static kern_return_t write_matrix_gain(int node, int16_t val) {
-    uint8_t buf[2] = {(uint8_t)(val & 0xff), (uint8_t)((val >> 8) & 0xff)};
-    return ctl_write(node, 0x3c00, buf, 2);
-}
+#define read_clock_source()      sc_read_clock_source(g_dev)
+#define read_sample_rate()       sc_read_sample_rate(g_dev)
+#define read_route(o)            sc_read_route(g_dev, (o))
+#define read_bus_volume(b)       sc_read_bus_volume(g_dev, (b))
+#define read_bus_mute(b)         sc_read_bus_mute(g_dev, (b))
+#define read_mixer_input(s)      sc_read_mixer_input(g_dev, (s))
+#define read_matrix_gain(n)      sc_read_matrix_gain(g_dev, (n))
+#define write_bus_volume(b, v)   sc_write_bus_volume(g_dev, (b), (v))
+#define write_mixer_input(s, v)  sc_write_mixer_input(g_dev, (s), (v))
+#define write_matrix_gain(n, v)  sc_write_matrix_gain(g_dev, (n), (v))
 
 /* ── EDN helpers ───────────────────────────────────────── */
 
@@ -204,8 +96,7 @@ static void cmd_clock(int argc, char **argv) {
             edn_error("clock value must be 1 (internal), 2 (spdif), or 3 (adat)");
             return;
         }
-        uint8_t buf = (uint8_t)val;
-        kern_return_t kr = ctl_write(0x0100, 0x2800, &buf, 1);
+        kern_return_t kr = sc_write_clock_source(g_dev, val);
         if (kr != KERN_SUCCESS) { edn_error_code("write failed", kr); return; }
         int readback = read_clock_source();
         printf("{:ok true :source %d}\n", readback);
@@ -232,8 +123,7 @@ static void cmd_route(int argc, char **argv) {
             edn_error("output index must be 0-19"); return;
         }
         int before = read_route(out);
-        uint8_t buf[2] = {(uint8_t)src, 0x00};
-        kern_return_t kr = ctl_write(out, 0x3300, buf, 2);
+        kern_return_t kr = sc_write_route(g_dev, out, src);
         if (kr != KERN_SUCCESS) { edn_error_code("write failed", kr); return; }
         int after = read_route(out);
         printf("{:ok true :output %d :before %d :after %d}\n", out, before, after);
@@ -378,16 +268,7 @@ static void cmd_save(int argc, char **argv) {
         edn_error("save requires confirm: 'save confirm'");
         return;
     }
-    uint8_t buf[1] = {0xa5};
-    IOUSBDevRequest req = {
-        .bmRequestType = 0x21,
-        .bRequest      = 0x03,
-        .wValue        = 0x005a,
-        .wIndex        = 0x3c00,
-        .wLength       = 1,
-        .pData         = buf
-    };
-    kern_return_t kr = (*g_dev)->DeviceRequest(g_dev, &req);
+    kern_return_t kr = sc_save_to_flash(g_dev);
     if (kr == KERN_SUCCESS) printf("{:ok true}\n");
     else                    edn_error_code("save failed", kr);
 }
@@ -396,18 +277,10 @@ static void cmd_doctor(int argc, char **argv) {
     (void)argc; (void)argv;
     printf("{:device ");
 
-    CFMutableDictionaryRef match = IOServiceMatching("IOUSBHostDevice");
-    CFDictionarySetValue(match, CFSTR("idVendor"),
-        CFNumberCreate(NULL, kCFNumberSInt32Type, &(int32_t){VENDOR_ID}));
-    CFDictionarySetValue(match, CFSTR("idProduct"),
-        CFNumberCreate(NULL, kCFNumberSInt32Type, &(int32_t){PRODUCT_ID}));
-    io_service_t svc = IOServiceGetMatchingService(kIOMainPortDefault, match);
-
-    if (!svc) {
+    if (!sc_present()) {
         printf("{:found false}");
     } else {
         printf("{:found true}");
-        IOObjectRelease(svc);
     }
 
     printf(" :blockers [");
