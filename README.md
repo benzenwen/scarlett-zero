@@ -38,7 +38,10 @@ and Monitor sections below.
 * File: Open/Save snapshots (.scarlettmix JSON), import legacy
   MixControl .18i20 files, Restore Factory Defaults, Clear All.
 
-Connecting never writes to the device. Unverified hardware commands
+On connect the app adopts the device state (or your saved document if it
+matches), then writes that state in full once — the 18i20's mixer matrix
+reads back 0 dB after power-up no matter what it is actually doing, so
+only written values can be trusted. Unverified hardware commands
 (meters, front-panel HW Control, mono, Save to Hardware) sit behind
 Settings ▸ "Enable experimental hardware features", off by default.
 

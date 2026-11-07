@@ -6,10 +6,13 @@ import UniformTypeIdentifiers
 /// change is rendered by `MixEngine` and handed to the device session, which
 /// writes only what differs.
 ///
-/// Connecting never writes. If the saved document renders to exactly what
-/// the device holds it's kept (with its pans, links, names); otherwise the
-/// app rebuilds a document from the hardware — unless you edited offline,
-/// in which case it asks which side wins.
+/// On connect, if the saved document renders to exactly what the device
+/// reports it's kept (with its pans, links, names); otherwise the app
+/// rebuilds a document from the hardware — unless you edited offline, in
+/// which case it asks which side wins. Either way the chosen state is then
+/// written in full once: after power-up the 18i20's matrix registers read
+/// back 0 dB regardless of what the mixer is doing, so a read alone can't be
+/// trusted to describe what you hear.
 @MainActor @Observable
 final class AppModel {
     var doc: MixerDocument {
@@ -140,6 +143,7 @@ final class AppModel {
             console.append(.event, "document rebuilt from hardware state")
             replaceFromHardware(hw)
         }
+        push()
     }
 
     private func replaceFromHardware(_ hw: HardwareImage) {
@@ -157,6 +161,7 @@ final class AppModel {
         conflict = nil
         editedOffline = false
         replaceFromHardware(hw)
+        push()
     }
 
     /// Conflict resolution: send this document to the device.

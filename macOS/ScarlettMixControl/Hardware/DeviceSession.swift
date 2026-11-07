@@ -74,6 +74,10 @@ final class DeviceSession: @unchecked Sendable {
     private var polling = Polling()
 
     private var written: HardwareImage?
+    /// Set after a full read: the next flush writes everything, not just the
+    /// diff. Matrix registers read 0 dB after power-up whatever the DSP is
+    /// doing, so `written` only becomes true once we've written it ourselves.
+    private var resyncPending = false
     private var desired: HardwareImage?
     private var flushPending = false
     private var readFailures = 0
@@ -152,6 +156,7 @@ final class DeviceSession: @unchecked Sendable {
                 return
             }
             written = image
+            resyncPending = true
             desired = nil
             let rate = Int(sc_read_sample_rate(device))
             log(.read, "reloaded full state from device")
@@ -237,6 +242,7 @@ final class DeviceSession: @unchecked Sendable {
             return
         }
         written = image
+        resyncPending = true
         desired = nil
         let rate = Int(sc_read_sample_rate(handle))
         lastClock = (image.clock, rate)
@@ -295,30 +301,33 @@ final class DeviceSession: @unchecked Sendable {
             return false
         }
 
+        let all = resyncPending
+        if all { log(.event, "writing full state once — device read-back isn't live until written") }
         if d.clock != w.clock, check(sc_write_clock_source(device, Int32(d.clock)), "Clock source", "clock \(d.clock)") {
             w.clock = d.clock
         }
-        for o in 0..<DeviceMap.outputCount where d.routing[o] != w.routing[o] {
+        for o in 0..<DeviceMap.outputCount where all || d.routing[o] != w.routing[o] {
             if check(sc_write_route(device, Int32(o), Int32(d.routing[o])), "Routing", "route \(o) \(d.routing[o])") {
                 w.routing[o] = d.routing[o]
             }
         }
-        for s in 0..<DeviceMap.mixerInputCount where d.mixerInputs[s] != w.mixerInputs[s] {
+        for s in 0..<DeviceMap.mixerInputCount where all || d.mixerInputs[s] != w.mixerInputs[s] {
             if check(sc_write_mixer_input(device, Int32(s), Int32(d.mixerInputs[s])), "Mixer input", "mixer \(s) \(d.mixerInputs[s])") {
                 w.mixerInputs[s] = d.mixerInputs[s]
             }
         }
-        for n in 0..<DeviceMap.matrixNodeCount where d.matrix[n] != w.matrix[n] {
+        for n in 0..<DeviceMap.matrixNodeCount where all || d.matrix[n] != w.matrix[n] {
             if check(sc_write_matrix_gain(device, Int32(n), d.matrix[n]), "Mixer gain", "matrix \(n) \(d.matrix[n])") {
                 w.matrix[n] = d.matrix[n]
             }
         }
-        for b in 0..<DeviceMap.busCount where d.buses[b] != w.buses[b] {
+        for b in 0..<DeviceMap.busCount where all || d.buses[b] != w.buses[b] {
             if check(sc_write_bus_volume(device, Int32(b), d.buses[b]), "Output volume", "bus \(b) \(d.buses[b])") {
                 w.buses[b] = d.buses[b]
             }
         }
         written = w
+        if failure == nil { resyncPending = false }
         if let failure { onEvent?(.writeFailed(failure)) }
     }
 
