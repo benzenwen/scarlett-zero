@@ -13,7 +13,6 @@ struct SettingsView: View {
                     Text("These use USB commands recovered from the MixControl 1.10.6 app that haven't been verified on this unit yet:")
                     VStack(alignment: .leading, spacing: 3) {
                         Label("Level meters (polled 20× per second)", systemImage: "chart.bar.fill")
-                        Label("HW Control: follow the front-panel knob, DIM and MUTE", systemImage: "dial.medium")
                         Label("Mono monitor sum", systemImage: "circle.lefthalf.filled")
                         Label("File ▸ Save to Hardware (writes flash)", systemImage: "memorychip")
                     }

@@ -32,7 +32,7 @@ and Monitor sections below.
   link, and a mix output strip with destinations, Copy To…, and Stereo.
 * Routing: all 20 outputs with MixControl's routing presets.
 * Monitor: per-output controlled/muted/fixed buttons, level knob,
-  Dim, Mute, L/R mute, pad, monitor presets. HW Control hands the
+  Dim, Mute, L/R mute, pad, monitor presets. HW Front Panel hands the
   controlled outputs to the front-panel knob, DIM and MUTE inside the
   device itself (the on-screen knob follows it); off, the app's knob
   sets their level and the front knob does nothing.

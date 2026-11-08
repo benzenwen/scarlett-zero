@@ -28,42 +28,51 @@ struct MonitorPanel: View {
 
             HStack(alignment: .center, spacing: 18) {
                 outputGrid
-                VStack(spacing: 6) {
-                    LevelKnob(dB: $model.doc.monitor.levelDB, disabled: hw)
-                        // Overlaid above the knob, in the gap under the section
-                        // header, so it takes no layout space and toggling HW
-                        // Control never shifts the row.
-                        .overlay(alignment: .top) {
-                            if hw {
-                                Text("FRONT PANEL")
-                                    .font(.system(size: 8, weight: .heavy))
-                                    .tracking(1)
-                                    .foregroundStyle(Theme.control)
-                                    .fixedSize()
-                                    .offset(y: -13)
-                            }
-                        }
-                    Text(mon.levelDB <= MixerDocument.monitorFloorDB ? "−∞ dB" : "\(Int(mon.levelDB)) dB")
-                        .font(.system(size: 13, weight: .semibold, design: .monospaced))
-                        .foregroundStyle(mon.dim ? Theme.solo : Theme.text)
-                }
-                .frame(width: 104)
-                VStack(spacing: 5) {
-                    LitButton(title: "DIM", isOn: mon.dim, color: Theme.solo, width: 64, height: 24,
-                              help: "Dim −18 dB") { model.doc.monitor.dim.toggle() }
-                        .disabled(hw)
-                    LitButton(title: "MUTE", isOn: mon.mute, color: Theme.mute, width: 64, height: 24,
-                              help: "Mute all monitor-controlled outputs") { model.doc.monitor.mute.toggle() }
-                        .disabled(hw)
-                    HStack(spacing: 4) {
-                        LitButton(title: "L", isOn: mon.muteLeft, color: Theme.mute, width: 30, height: 22,
-                                  help: "Mute odd-numbered (left) outputs") { model.doc.monitor.muteLeft.toggle() }
-                        LitButton(title: "R", isOn: mon.muteRight, color: Theme.mute, width: 30, height: 22,
-                                  help: "Mute even-numbered (right) outputs") { model.doc.monitor.muteRight.toggle() }
+                // Knob + DIM/MUTE form the cluster the front panel takes
+                // over; one badge across it marks the state, and L/R and
+                // PAD (still applied by the app) sit outside it.
+                HStack(alignment: .center, spacing: 18) {
+                    VStack(spacing: 6) {
+                        LevelKnob(dB: $model.doc.monitor.levelDB, disabled: hw)
+                        Text(mon.levelDB <= MixerDocument.monitorFloorDB ? "−∞ dB" : "\(Int(mon.levelDB)) dB")
+                            .font(.system(size: 13, weight: .semibold, design: .monospaced))
+                            .foregroundStyle(mon.dim ? Theme.solo : Theme.text)
                     }
-                    LitButton(title: "−20 PAD", isOn: mon.pad, color: Theme.control, width: 64, height: 22,
-                              help: "−20 dB on Monitor Outputs 1/2 (applied as output attenuation)") {
-                        model.doc.monitor.pad.toggle()
+                    .frame(width: 104)
+                    VStack(spacing: 5) {
+                        LitButton(title: "DIM", isOn: mon.dim, color: Theme.solo, width: 64, height: 24,
+                                  help: "Dim −18 dB") { model.doc.monitor.dim.toggle() }
+                            .disabled(hw)
+                        LitButton(title: "MUTE", isOn: mon.mute, color: Theme.mute, width: 64, height: 24,
+                                  help: "Mute all monitor-controlled outputs") { model.doc.monitor.mute.toggle() }
+                            .disabled(hw)
+                        HStack(spacing: 4) {
+                            LitButton(title: "L", isOn: mon.muteLeft, color: Theme.mute, width: 30, height: 22,
+                                      help: "Mute the controlled odd-numbered (left) outputs") { model.doc.monitor.muteLeft.toggle() }
+                            LitButton(title: "R", isOn: mon.muteRight, color: Theme.mute, width: 30, height: 22,
+                                      help: "Mute the controlled even-numbered (right) outputs") { model.doc.monitor.muteRight.toggle() }
+                        }
+                        LitButton(title: "−20 PAD", isOn: mon.pad, color: Theme.control, width: 64, height: 22,
+                                  help: "−20 dB on Monitor Outputs 1/2 (applied as output attenuation)") {
+                            model.doc.monitor.pad.toggle()
+                        }
+                    }
+                }
+                // Centred on the knob's height (92 pt), which lines up with MUTE.
+                .overlay(alignment: .top) {
+                    if hw {
+                        Text("HW FRONT PANEL")
+                            .font(.system(size: 9, weight: .heavy))
+                            .tracking(1)
+                            .foregroundStyle(Theme.control)
+                            .fixedSize()
+                            .padding(.horizontal, 10)
+                            .padding(.vertical, 4)
+                            .background(Theme.panel.opacity(0.92), in: .capsule)
+                            .overlay(Capsule().strokeBorder(Theme.control.opacity(0.7)))
+                            .shadow(color: Theme.control.opacity(0.35), radius: 4)
+                            .frame(height: 92)
+                            .allowsHitTesting(false)
                     }
                 }
             }
@@ -75,7 +84,7 @@ struct MonitorPanel: View {
                     model.setMono(!mon.mono)
                 }
                 .disabled(!model.experimental)
-                LitButton(title: "HW CONTROL", isOn: hw, color: Theme.control, height: 22,
+                LitButton(title: "HW FRONT PANEL", isOn: hw, color: Theme.control, height: 22,
                           help: "On: the front MONITOR knob, DIM and MUTE act on the blue outputs in the "
                               + "device itself, even without this app. Off: the knob does nothing and "
                               + "the level here sets the blue outputs.") {
