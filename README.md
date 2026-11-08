@@ -74,6 +74,10 @@ One-shot:
   scarlett_ctl rate
   scarlett_ctl route [OUT SRC]
   scarlett_ctl bus    [BUS RAW]
+  scarlett_ctl mute   BUS RAW        (experimental)
+  scarlett_ctl knobset MASK          (outputs the front knob attenuates)
+  scarlett_ctl buttonset MASK        (outputs front MUTE/DIM act on)
+  scarlett_ctl dacmute [OUT 0|1]
   scarlett_ctl mixer  [SLOT SRC]
   scarlett_ctl matrix [NODE RAW]
   scarlett_ctl save confirm
@@ -83,6 +87,8 @@ Daemon (newline-delimited same grammar on stdin, EDN on stdout):
     additional: ping, quit
 
 Writes take raw signed int16. 0x0000 = 0 dB, 0x8000 = silence.
+MASK is 0–0x3ff, bit n = analog output n (bit 0 = Monitor 1). These
+sets live in RAM; the app rewrites them on connect.
 
 ## Babashka script
 
